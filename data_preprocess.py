@@ -40,12 +40,12 @@ class CasiaSurf(object):
 
                 depth_path = line_lst[1]
                 resize_depth_path = 'Val-112/' + depth_path.split('/', 1)[1]
-                depth_img = cv2.imread('../phase1/' + depth_path)
-                depth_img_resized = cv2.resize(depth_img, (112,112))
-                depth_path_lst = ['..', 'phase1']
-                depth_path_lst.extend(resize_depth_path.split('/')[0:-1])
-                mkdir_if_not_exist(depth_path_lst)
-                cv2.imwrite('../phase1/' + resize_depth_path, depth_img_resized)
+                # depth_img = cv2.imread('../phase1/' + depth_path)
+                # depth_img_resized = cv2.resize(depth_img, (112,112))
+                # depth_path_lst = ['..', 'phase1']
+                # depth_path_lst.extend(resize_depth_path.split('/')[0:-1])
+                # mkdir_if_not_exist(depth_path_lst)
+                # cv2.imwrite('../phase1/' + resize_depth_path, depth_img_resized)
 
                 # ir_path = line_lst[2]
                 # resize_ir_path = 'Val-112/' + ir_path.split('/', 1)[1]
@@ -104,12 +104,12 @@ class CasiaSurf(object):
 
                 depth_path = line_lst[1]
                 resize_depth_path = 'Training-112/' + depth_path.split('/', 1)[1]
-                depth_img = cv2.imread('../phase1/' + depth_path)
-                depth_img_resized = cv2.resize(depth_img, (112,112))
-                depth_path_lst = ['..', 'phase1']
-                depth_path_lst.extend(resize_depth_path.split('/')[0:-1])
-                mkdir_if_not_exist(depth_path_lst)
-                cv2.imwrite('../phase1/' + resize_depth_path, depth_img_resized)
+                # depth_img = cv2.imread('../phase1/' + depth_path)
+                # depth_img_resized = cv2.resize(depth_img, (112,112))
+                # depth_path_lst = ['..', 'phase1']
+                # depth_path_lst.extend(resize_depth_path.split('/')[0:-1])
+                # mkdir_if_not_exist(depth_path_lst)
+                # cv2.imwrite('../phase1/' + resize_depth_path, depth_img_resized)
 
                 # ir_path = line_lst[2]
                 # resize_ir_path = 'Training-112/' + ir_path.split('/', 1)[1]
@@ -157,6 +157,80 @@ class CasiaSurf(object):
 
         print('preprocess train list success!')
 
+    def use_train_sublist(self):
+        positive_num = 0
+        negative_num = 0
+
+        with open('data/train_depth_all_112_29266.lst', 'r') as f:
+            i = 0
+            for line in f.readlines():
+                line = line.strip() # 去掉每行头尾空白
+                line_lst = line.split() # 按空白符分割
+
+                label = int(line_lst[1])
+                depth_path = line_lst[2]
+                
+                if 0 == label:
+                    if not '_enm_' in depth_path:
+                        self.depth_list.append(line)
+                        negative_num += 1
+                else:
+                    positive_num += 1
+                    self.depth_list.append(line)
+
+                i += 1
+                print('process train line->%d' %(i))
+                
+        print('positive_num=%d' %(positive_num))  # 8942
+        print('negative_num=%d' %(negative_num))  # 6518
+
+        random.shuffle(self.depth_list)
+
+        with open('data/train_depth_noenmfake_112_{}.lst'.format(len(self.depth_list)), 'w') as f:
+            f.write('\n'.join(self.depth_list))
+
+        print('preprocess train sublist success!')
+
+    def aug_trainlist(self):
+
+        with open('data/train_depth_all_112_29266.lst', 'r') as f:
+            i = 0
+            pLst = []
+            nLst = []
+            allLst = []
+            for line in f.readlines():
+                line = line.strip() # 去掉每行头尾空白
+                line_lst = line.split() # 按空白符分割
+
+                label = int(line_lst[1])
+                # depth_path = line_lst[2]
+                
+                if 0 == label:
+                    nLst.append(line)
+                else:
+                    pLst.append(line)
+
+                i += 1
+                print('process aug train line->%d' %(i))
+                
+        print('positive_num=%d' %(len(pLst)))  # 8942
+        print('negative_num=%d' %(len(nLst)))  # 20324
+
+        # augPLst = random.sample(pLst, 8942)
+        augPLst = pLst[:] # 拷贝自身
+        print('augPLst num=%d' %(len(augPLst)))
+        pLst.extend(augPLst)
+        print('positive_num=%d' %(len(pLst)))  # 17884
+        print('negative_num=%d' %(len(nLst)))  # 20324
+
+        allLst = pLst + nLst
+        print('allLst num=%d' %(len(allLst))) # 38208
+        random.shuffle(allLst)
+
+        with open('data/train_depth_aug_112_{}.lst'.format(len(allLst)), 'w') as f:
+            f.write('\n'.join(allLst))
+
+        print('preprocess aug trainlist success!')
 
 def parse_args():
     """Defines all arguments.
@@ -168,8 +242,14 @@ def parse_args():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         description='Create an image list or \
         make a record database by reading from an image list')
-    parser.add_argument('--train', action='store_true',
-        help='generate train/val list file & resize train/val image to 112 size which saved in ../phase1/ dir.')
+    # parser.add_argument('--train', action='store_true',
+    #     help='generate train/val list file & resize train/val image to 112 size which saved in ../phase1/ dir.')
+    parser.add_argument('train', help='generate train/val list file & resize train/val image to 112 size which saved in ../phase1/ dir.')
+    cgroup = parser.add_argument_group('Options for creating image lists')
+    cgroup.add_argument('--no-enmfake', action='store_true', default=False,
+        help='remove enm fake train image dataset')
+    cgroup.add_argument('--aug', action='store_true', default=False,
+        help='augment train positive image dataset')
     args = parser.parse_args()
     return args
 
@@ -177,8 +257,13 @@ if __name__ == "__main__":
     args = parse_args()
     casiaSurf = CasiaSurf()
     # mkdir_if_not_exist(['data'])
-    if args.train:
-        casiaSurf.preprocess_train_list()
+    if args.train == 'train':
+        if args.no_enmfake:
+            casiaSurf.use_train_sublist()
+        elif args.aug:
+            casiaSurf.aug_trainlist()
+        else:
+            casiaSurf.preprocess_train_list()
     else:
         casiaSurf.preprocess_val_list()
     

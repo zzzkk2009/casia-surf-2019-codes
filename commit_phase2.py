@@ -87,9 +87,9 @@ if __name__ == '__main__':
     #time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
     date = time.strftime("%Y-%m-%d", time.localtime()) 
 
-    test_list_filename = args.filename # '../phase1/val_public_list.txt'
+    test_list_filename = args.filename # '../phase2/test_public_list.txt'
     with open(test_list_filename, 'r') as f:
-        with open('commit_phase1_depth_{}_server_{}.txt'.format(date, epoch_depth), 'w') as df:
+        with open('commit_phase2_depth_{}_server_{}.txt'.format(date, epoch_depth), 'w') as df:
             for line in f.readlines():
                 line = line.strip() # 去掉每行头尾空白
                 line_lst = line.split() # 按空白符分割
@@ -98,7 +98,7 @@ if __name__ == '__main__':
                 # ir_path = line_lst[2]
 
                 time0 = time.time()
-                depth_prob = predict(mod_depth, '../phase1/' + depth_path, 'depth')
+                depth_prob = predict(mod_depth, '../phase2/' + depth_path, 'depth')
                 # print(depth_prob)
                 time1 = time.time()
                 print('predict time={0}'.format(time1 - time0))
@@ -108,7 +108,7 @@ if __name__ == '__main__':
                 df.writelines(line_depth)
 
     time_end = time.time()
-    print('valid total time={0}'.format(time_end - time_start))
+    print('test total time={0}'.format(time_end - time_start))
 
                 
 

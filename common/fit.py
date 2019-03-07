@@ -165,8 +165,8 @@ def fit(args, network, data_loader, **kwargs):
     if args.network == 'alexnet':
         # AlexNet will not converge using Xavier
         initializer = mx.init.Normal()
-    if args.network in ['shufflenet', 'shufflenet_v2', 'zkflow_shufflenet_v2',
-                        'mobilenet','mobilenetv2','zkflow_mobilenet']:
+    elif args.network in ['shufflenet', 'shufflenet_v2', 'zkflow_shufflenet_v2',
+                        'mobilenet','mobilenetv2','zkflow_mobilenet','vmspoofface','vmspoofnet','vmspoofnet_v2']:
         initializer = mx.init.Uniform()
     else:
         initializer = mx.init.Xavier(
