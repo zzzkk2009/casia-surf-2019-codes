@@ -1,6 +1,7 @@
-
+## Phase1 Rank(1/340)
 ![phase1_result_rank](https://github.com/zzzkk2009/casia-surf-2019-codes/blob/master/imgs/casia_phase1.jpg "phase1_result_rank")
 
+## final Rank(6/340)
 ![phase2_result_rank](https://github.com/zzzkk2009/casia-surf-2019-codes/blob/master/imgs/casia_phase2.jpg "phase2_result_rank")
 
 
