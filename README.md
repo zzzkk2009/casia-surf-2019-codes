@@ -1,4 +1,9 @@
 
+![phase1_result_rank](https://github.com/zzzkk2009/casia-surf-2019-codes/blob/master/imgs/casia_phase1.jpg "phase1_result_rank")
+
+![phase2_result_rank](https://github.com/zzzkk2009/casia-surf-2019-codes/blob/master/imgs/casia_phase2.jpg "phase2_result_rank")
+
+
 ## 1、代码和数据集存放
     1.1 获取数据集，即CASIA-SURF文件夹，里面包含phase1和phase2两个文件夹，进入phase1，解压train.zip和valid.zip文件，得到Training文件夹，train_list.txt文件、Val文件夹、val_public_list.txt文件；
     1.2 将本项目整个文件夹casia-surf-2019-codes拷贝到CASIA-SURF目录里面，保证和phase1同目录；
